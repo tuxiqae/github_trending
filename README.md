@@ -1,6 +1,6 @@
-#Github Crawler
+# GitHub Crawler
 
-##Description:
-Iterates over all [trending](https://github.com/trending) repositories and prints their information
+## Description:
+Scrapes the [trending](https://github.com/trending) repositories on GitHub and prints their information
 
 WIP
