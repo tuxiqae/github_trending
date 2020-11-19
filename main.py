@@ -46,11 +46,19 @@ def populate_languages(elem, list_dict):
         list_dict["languages"].append("N/A")
 
 
+def export(filename, data_frame):
+    fh = open(filename, 'w')
+    fh.write(data_frame.to_csv())
+    fh.close()
+
+
 # def trending_devs(URL):
 #
 
 if __name__ == '__main__':
     URL = "https://github.com/trending"
     df = trending_repos(get_url(URL))
+
+    export('repos.txt', df)
 
     print(df)
