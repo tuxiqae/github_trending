@@ -23,10 +23,10 @@ def trending_repos(res):
         "stargazers": list(),
         "daily_stargazers": list(),
         "forks": list(),
+        "top_contributors": list(),
     }
 
     doc = bs(res.text, "lxml")
-
     for repo in doc.find_all("article", class_="Box-row"):
         populate_names(repo, props)
         populate_languages(repo, props)
@@ -34,6 +34,7 @@ def trending_repos(res):
         populate_stargazers(repo, props)
         populate_forks(repo, props)
         populate_daily_stars(repo, props)
+        populate_top_contributors(repo, props)
 
     print(json.dumps(props))
 
@@ -75,6 +76,15 @@ def populate_daily_stars(elem, list_dict):
 
 def populate_forks(elem, list_dict):
     list_dict["forks"].append(numstr_to_int(elem.find("svg", class_="octicon-repo-forked").parent.text.strip()))
+
+
+def populate_top_contributors(elem, list_dict):
+    contrib_list = list()
+
+    for contrib in elem.find(string=re.compile("Built by")).parent.find_all("a"):
+        contrib_list.append(contrib["href"].replace("/", ""))
+
+    list_dict["top_contributors"].append(contrib_list)
 
 
 def numstr_to_int(numstr):
