@@ -72,7 +72,7 @@ def populate_stargazers(elem, list_dict):
 
 
 def populate_daily_stars(elem, list_dict):
-    list_dict["daily_stargazers"].append(int(elem.find(string=re.compile("stars today$")).split()[0]))
+    list_dict["daily_stargazers"].append(numstr_to_int(elem.find(string=re.compile("stars today$")).split()[0]))
 
 
 def populate_forks(elem, list_dict):
