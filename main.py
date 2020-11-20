@@ -2,6 +2,7 @@ import requests as r
 from bs4 import BeautifulSoup as bs
 import pandas as pd
 import json
+import re
 
 
 def get_url(url):
@@ -14,14 +15,14 @@ def get_url(url):
 
 
 def trending_repos(res):
-    props = {'names': list(), "owners": list(), "languages": list()}
+    props = {'names': list(), "owners": list(), "languages": list(), "stars": list()}
 
     doc = bs(res.text, "lxml")
-    # repos_box = doc.find("div", class_="Box")
 
     for repo in doc.find_all("article", class_="Box-row"):
         populate_names(repo, props)
         populate_languages(repo, props)
+        populate_stars(repo, props)
 
     print(json.dumps(props))
 
@@ -46,6 +47,10 @@ def populate_languages(elem, list_dict):
         list_dict["languages"].append("N/A")
 
 
+def populate_stars(elem, list_dict):
+    list_dict["stars"].append(int(elem.find(href=re.compile("stargazers$")).text.strip().replace(",", "")))
+
+
 def export(filename, data_frame):
     fh = open(filename, 'w')
     fh.write(data_frame.to_csv())
@@ -59,6 +64,6 @@ if __name__ == '__main__':
     URL = "https://github.com/trending"
     df = trending_repos(get_url(URL))
 
-    export('repos.txt', df)
+    export('repos.csv', df)
 
     print(df)
