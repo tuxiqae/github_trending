@@ -27,6 +27,7 @@ def trending_repos(res):
     }
 
     doc = bs(res.text, "lxml")
+
     for repo in doc.find_all("article", class_="Box-row"):
         populate_names(repo, props)
         populate_languages(repo, props)
@@ -71,7 +72,7 @@ def populate_stargazers(elem, list_dict):
 
 
 def populate_daily_stars(elem, list_dict):
-    list_dict["daily_stargazers"].append(elem.find(string=re.compile("stars today$")).split()[0])
+    list_dict["daily_stargazers"].append(int(elem.find(string=re.compile("stars today$")).split()[0]))
 
 
 def populate_forks(elem, list_dict):
@@ -100,7 +101,7 @@ def export(filename, data_frame):
 if __name__ == '__main__':
     URL = "https://github.com/trending"
     df = trending_repos(get_url(URL))
-
+    df["stars growth %"] = (df["daily_stargazers"] / df["stargazers"]) * 100
     export('repos.csv', df)
 
     print(df)
