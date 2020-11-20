@@ -62,7 +62,7 @@ def populate_languages(elem, list_dict):
 
 def populate_descriptions(elem, list_dict):
     if (desc := elem.find("p")) is not None:
-        list_dict["description"].append(desc.text)
+        list_dict["description"].append(desc.text.strip())
     else:
         list_dict["description"].append("N/A")
 
