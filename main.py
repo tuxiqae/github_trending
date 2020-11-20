@@ -21,6 +21,7 @@ def trending_repos(res):
         "language": list(),
         "description": list(),
         "stargazers": list(),
+        "daily_stargazers": list(),
         "forks": list(),
     }
 
@@ -32,6 +33,7 @@ def trending_repos(res):
         populate_descriptions(repo, props)
         populate_stargazers(repo, props)
         populate_forks(repo, props)
+        populate_daily_stars(repo, props)
 
     print(json.dumps(props))
 
@@ -67,6 +69,10 @@ def populate_stargazers(elem, list_dict):
     list_dict["stargazers"].append(numstr_to_int(elem.find(href=re.compile("stargazers$")).text.strip()))
 
 
+def populate_daily_stars(elem, list_dict):
+    list_dict["daily_stargazers"].append(elem.find(string=re.compile("stars today$")).split()[0])
+
+
 def populate_forks(elem, list_dict):
     list_dict["forks"].append(numstr_to_int(elem.find("svg", class_="octicon-repo-forked").parent.text.strip()))
 
@@ -80,9 +86,6 @@ def export(filename, data_frame):
     fh.write(data_frame.to_csv())
     fh.close()
 
-
-# def trending_devs(URL):
-#
 
 if __name__ == '__main__':
     URL = "https://github.com/trending"
