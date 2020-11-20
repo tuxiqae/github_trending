@@ -15,14 +15,23 @@ def get_url(url):
 
 
 def trending_repos(res):
-    props = {'names': list(), "owners": list(), "languages": list(), "stars": list()}
+    props = {
+        'name': list(),
+        "owner": list(),
+        "language": list(),
+        "description": list(),
+        "stargazers": list(),
+        "forks": list(),
+    }
 
     doc = bs(res.text, "lxml")
 
     for repo in doc.find_all("article", class_="Box-row"):
         populate_names(repo, props)
         populate_languages(repo, props)
-        populate_stars(repo, props)
+        populate_descriptions(repo, props)
+        populate_stargazers(repo, props)
+        populate_forks(repo, props)
 
     print(json.dumps(props))
 
@@ -36,19 +45,34 @@ def name_printer(names, owners):
 
 def populate_names(elem, list_dict):
     owner, _, name = elem.find("h1", class_="h3 lh-condensed").text.strip().split()
-    list_dict["owners"].append(owner)
-    list_dict["names"].append(name)
+    list_dict["owner"].append(owner)
+    list_dict["name"].append(name)
 
 
 def populate_languages(elem, list_dict):
     if (lang := elem.find("span", itemprop="programmingLanguage")) is not None:
-        list_dict["languages"].append(lang.text)
+        list_dict["language"].append(lang.text)
     else:
-        list_dict["languages"].append("N/A")
+        list_dict["language"].append("N/A")
 
 
-def populate_stars(elem, list_dict):
-    list_dict["stars"].append(int(elem.find(href=re.compile("stargazers$")).text.strip().replace(",", "")))
+def populate_descriptions(elem, list_dict):
+    if (desc := elem.find("p")) is not None:
+        list_dict["description"].append(desc.text)
+    else:
+        list_dict["description"].append("N/A")
+
+
+def populate_stargazers(elem, list_dict):
+    list_dict["stargazers"].append(numstr_to_int(elem.find(href=re.compile("stargazers$")).text.strip()))
+
+
+def populate_forks(elem, list_dict):
+    list_dict["forks"].append(numstr_to_int(elem.find("svg", class_="octicon-repo-forked").parent.text.strip()))
+
+
+def numstr_to_int(numstr):
+    return int(numstr.replace(",", ""))
 
 
 def export(filename, data_frame):
